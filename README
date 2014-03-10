@@ -11,7 +11,7 @@ usage:
 
 5 adjust you box file with guide line : https://code.google.com/p/tesseract-ocr/wiki/TrainingTesseract3
 
-6 if you want you can save your fixed box files and images, just run save it will save them in stuff/2014xxxxx
+6 If you want you can save your fixed box files and images, just run ./save then it will save box`s stuff in stuff/2014xxxxx
 
 7 run ./train 
 
