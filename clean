@@ -4,10 +4,10 @@ box=$tr/box
 out=$tr/out
 
 case "$1" in
-	-box) 
+	--box) 
 	echo clear box
 	rm $box/*;;
-	-out)
+	--out)
 	echo clear out
 	rm $out/*;;
 	*)

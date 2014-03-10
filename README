@@ -17,4 +17,4 @@ usage:
 
 8 cd out, and copy yourlang.traindata to the your/tesseract/tessdata
 
-9 you also can run ./clean -out to remove all the stuff in out folder and also ./clean -box
+9 you also can run ./clean --out to remove all the stuff in out folder and also ./clean --box to clean box folder
