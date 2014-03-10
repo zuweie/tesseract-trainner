@@ -67,12 +67,13 @@ then
 	for file in $lang.$font.exp*.*
 	do
 	   filetype=`echo $file | gawk -F . '{print $NF}'`
-	   support=`echo $filetype | gawk '/'$spic/'{print $0}'`
+	   support=`echo $filetype | gawk '/'$spic'/{print $0}'`
 	   
            if [ -n "$support" ]
 	   then
 		echo training $file
 		tesseract $file $lang.$font.exp$exp box.train.stderr
+		exp=$[ $exp + 1 ]
 	   fi
 
 	done

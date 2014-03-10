@@ -65,11 +65,11 @@ elif [ -z $1 ]
 	do
 	   
 	   filetype=`echo $file | gawk -F . '{print $NF}'`
-	   support=`echo $filetype | gawk '/'$spic/'{print $0}'`
+	   support=`echo $filetype | gawk '/'$spic'/{print $0}'`
 		
            if [ -n "$support" ]
 	   then
-		echo support: $support
+		#echo support: $support
 		mv $file $lang.$font.exp$exp.$filetype
 		tesseract $lang.$font.exp$exp.$filetype $lang.$font.exp$exp batch.nochop makebox
                 exp=$[ $exp + 1]
