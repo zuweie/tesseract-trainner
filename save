@@ -1,0 +1,19 @@
+#!/bin/bash
+
+tr=`pwd`
+box=$tr/box
+stuff=$tr/stuff
+
+trver=`date +%Y%m%d%H%M%S`
+
+if [ -d $stuff ]
+then
+   echo copying the box file to stuff 
+else
+   mkdir $stuff
+   echo copying the box file to stuff
+fi
+
+mkdir $stuff/$trver
+
+cp $box/* $stuff/$trver

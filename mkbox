@@ -1,0 +1,92 @@
+#!/bin/bash
+
+tr=`pwd`
+box=$tr/box
+
+if [ "$1" = "--init" ]
+then
+   echo initialise the box dir, generate the train.config.. 
+   echo please edit you train configure with guide line
+   if [ -d $box ]
+   then
+	echo generate the train.config
+   else
+	mkdir $box
+	echo generate the train.config
+   fi
+   touch $box/train.config
+   echo '#!/bin/bash' > $box/train.config
+   echo '#Tell tesseract-trainer what is you language is making! eg. ENGLISH, lang=eng' >> $box/train.config
+   echo '#lang=?' >> $box/train.config
+   echo '#Tell tesseract-trainer what is you language font name. eg. timesitalic font=timesitalic' >> $box/train.config
+   echo '#font=?' >> $box/train.config
+   echo '#config you font_properties, all them default is 0' >> $box/train.config
+   echo 'italic=0' >> $box/train.config
+   echo 'bold=0' >> $box/train.config
+   echo 'fixed=0' >> $box/train.config
+   echo 'serif=0' >> $box/train.config
+   echo 'fraktur=0' >> $box/train.config
+   echo '#support pic type' >> $box/train.config
+   echo 'spic=bmp|jpg|jpeg|png|tif|tiff' >> $box/train.config
+elif [ -z $1 ]
+   then
+   echo making the box file..
+   cd $box
+   if [ -f train.config ]
+   then
+	# read the lang and font type
+	while read line
+	do
+           if [[ "$line" =~ ^[^#]*= ]]
+	   then
+	     name=`echo $line | gawk -F = '{print $1}'`
+	     var=`echo $line | gawk -F = '{print $2}'`
+	     if [ "$name" = "lang" ]
+	     then
+		lang=$var
+             elif [ "$name" = "font" ]
+	     then
+		font=$var
+	     elif [ "$name" = "spic" ]
+	     then	
+		spic=$var
+	     fi
+           fi
+ 	done < train.config
+	
+	if [ -z "$lang" ] || [ -z "$font" ]
+        then
+	   echo ERROR : It seem that you have not declare you lang type and font type, Please edit you box/train.config file
+	   exit 1
+	fi
+	
+	exp=0
+	for file in *
+	do
+	   
+	   filetype=`echo $file | gawk -F . '{print $NF}'`
+	   support=`echo $filetype | gawk '/'$spic/'{print $0}'`
+		
+           if [ -n "$support" ]
+	   then
+		echo support: $support
+		mv $file $lang.$font.exp$exp.$filetype
+		tesseract $lang.$font.exp$exp.$filetype $lang.$font.exp$exp batch.nochop makebox
+                exp=$[ $exp + 1]
+	   fi
+	   
+	done
+   else
+      echo you dont have create train.config file please run script/mkbox --init
+      exit 1
+   fi
+else
+   echo bad params
+fi
+
+
+
+
+
+
+

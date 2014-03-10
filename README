@@ -1,0 +1,20 @@
+this is simple script for generate the training data for tesseract 3.02.2
+usage:
+
+1 run the ./mkbox --init.
+
+2 edit the train.config in box folder with guide line in the config file.
+
+3 put all you train image to the box folder(The images must be supported by tesseract).
+
+4 run the ./mkbox
+
+5 adjust you box file with guide line : https://code.google.com/p/tesseract-ocr/wiki/TrainingTesseract3
+
+6 if you want you can save your fixed box files and images, just run save it will save them in stuff/2014xxxxx
+
+7 run ./train 
+
+8 cd out, and copy yourlang.traindata to the your/tesseract/tessdata
+
+9 you also can run ./clean -out to remove all the stuff in out folder and also ./clean -box

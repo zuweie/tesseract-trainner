@@ -1,0 +1,18 @@
+#!/bin/bash
+tr=`pwd`
+box=$tr/box
+out=$tr/out
+
+case "$1" in
+	-box) 
+	echo clear box
+	rm $box/*;;
+	-out)
+	echo clear out
+	rm $out/*;;
+	*)
+	echo clear all
+	rm $out/*
+	rm $box/*;;
+esac
+exit 0

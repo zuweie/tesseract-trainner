@@ -1,0 +1,151 @@
+#!/bin/bash
+
+
+tr=`pwd`
+box=$tr/box
+out=$tr/out
+
+#cp ../box/* ../out
+#cd ../out
+if [ -d $out ]
+then
+   echo move the train stuff to out dir 
+else
+   mkdir $out
+   echo move the train stuff to out dir 
+fi
+
+cd $out
+
+if [ -f $box/train.config ]
+then
+   while read line
+	do
+           if [[ "$line" =~ ^[^#]*= ]]
+	   then
+	     name=`echo $line | gawk -F = '{print $1}'`
+	     var=`echo $line | gawk -F = '{print $2}'`
+
+	     if [ "$name" = "lang" ]
+	     then
+		lang=$var
+             elif [ "$name" = "font" ]
+	     then
+		font=$var
+	     elif [ "$name" = "italic" ]
+	     then
+		italic=$var
+	     elif [ "$name" = "bold" ]
+	     then
+		bold=$var
+	     elif [ "$name" = "fixed" ]
+	     then
+		fixed=$var
+	     elif [ "$name" = "serif" ]
+             then
+		serif=$var
+	     elif [ "$name" = "fraktur" ]
+	     then
+	        fraktur=$var
+	     elif [ "$name" = "spic" ]
+	     then
+		spic=$var
+	     fi
+           fi
+ 	done < $box/train.config
+
+	if [ -z $lang ] || [ -z $font ]
+	then
+	   echo you have not tell tessertrainner what is the eng or font you want to train, Please edit you ./train.config file
+	   exit 1
+	fi
+	
+	echo moving the stuff to out dir ...
+	cp $box/$lang.$font.exp*.* $out/
+
+	exp=0
+	for file in $lang.$font.exp*.*
+	do
+	   filetype=`echo $file | gawk -F . '{print $NF}'`
+	   support=`echo $filetype | gawk '/'$spic/'{print $0}'`
+	   
+           if [ -n "$support" ]
+	   then
+		echo training $file
+		tesseract $file $lang.$font.exp$exp box.train.stderr
+	   fi
+
+	done
+
+	echo generate the unicharset ...
+	
+	if [ -z $italic ] || [ -z $bold ] || [ -z $fixed ] || [ -z $serif ] || [ -z $fraktur ]
+	then
+	   echo pleanse set the var or italic bold fixed serif fraktur in you box/train.config file and run ./train again
+	   exit 1
+	fi
+
+	unicharset_extractor $lang.$font.exp*.box
+	
+    	if [ -f unicharset ]
+	then
+	    unic=unicharset
+	else
+	    echo faild to generate unicharset file 
+   	    exit 1
+	fi
+
+	fp=font_properties
+	echo $font $italic $bold $fixed $serif $fraktur > $fp
+
+	echo generate shapetable ...
+	shapeclustering -F $fp -U $unic $lang.$font.exp*.tr
+	
+	echo mftraining ...
+	mftraining -F $fp -U $unic -O $lang.unicharset $lang.$font.exp*.tr
+
+	echo cntraining ...
+	cntraining $lang.$font.exp*.tr
+	
+	if [ -f shapetable ]
+	then
+    		mv shapetable $lang.shapetable
+	else
+    		echo faild generate shapetable
+    	exit 1
+	fi 
+
+
+	if [ -f normproto ]
+	then
+   		mv normproto $lang.normproto
+	else
+   		echo faild to generate normpoto
+  	 	exit 1
+	fi 
+
+	if [ -f inttemp ]
+	then
+   		mv inttemp $lang.inttemp
+	else
+   		echo faild to generate inttemp
+   		exit 1
+	fi 
+
+	if [ -f pffmtable ]
+	then
+   		mv pffmtable $lang.pffmtable
+	else
+   		echo faild to generate pffmtable
+   		exit 1
+	fi 
+	
+	echo generate training data ...
+
+	combine_tessdata $lang.
+
+else
+   echo you do not have confile. please run './mkbox --init' end edit you train.config file
+fi
+
+exit 0
